@@ -9,7 +9,36 @@ import re
 from datetime import timedelta
 
 EXAMPLE = 'C:/Users/Isaac/Projects/python-list-of-sessions/los_export.csv'
-LEN_REGEX = re.compile("\d+:\d+:\d+")
+
+
+class ModDict(dict):
+    """Subclass of dict to allow setting extra attributes"""
+    pass
+
+
+def split_by_unique_value(field, records):
+    """Split a list of records into sublists by common field"""
+    out = ModDict()
+    out.field = field # Allows checking which field was split on
+
+    for record in records:
+        value = record[field]
+        if value not in out.keys():
+            out[value] = [record]
+        else:
+            out[value].append(record)
+
+    return out
+
+
+def load_and_process(filename):
+    """Create a list of formatted record hashes from given file"""
+    # TODO: These function names are confusing as fuck
+    raw = load_csv(filename)
+    fixed = fix_rows(raw)
+    type_converted = convert_types(fixed)
+
+    return convert_csv(type_converted)
 
 
 def sum_durations(records):
