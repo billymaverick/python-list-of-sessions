@@ -13,14 +13,16 @@ LEN_REGEX = re.compile("\d+:\d+:\d+")
 
 
 def sum_durations(records):
-    """Given a dictionary of records, find and sum their durations"""
+    """Given a list of record hashes, return their total duration in seconds"""
     durations = [record['duration'] for record in records]
-    total = reduce(sum, durations, timedelta(0))
+    total = reduce(lambda x, y: x + y, durations)
 
     return total
 
+
 def convert_types(rows):
     """Attempt to convert data of various types"""
+    # TODO: Possible unicode problems?
     out = []
 
     for row in rows:
@@ -47,19 +49,8 @@ def convert_types(rows):
     return out
 
 
-def convert_duration_str(string):
-    """Convert a string in the format hh:mm:ss to timedelta"""
-    if re.search("\d+:\d+:\d+", string):
-        h, m, s = string.split(':')
-        duration = timedelta(hours=h, minutes=m, seconds=s)
-    else:
-        raise Exception("Incorrect format for duration string")
-
-    return duration
-
-
 def convert_csv(rows):
-    """Convert array of csv rows into a dictionary"""
+    """Convert list of csv rows into a dictionary"""
     headers = map(lambda h: h.lower().replace(' ', '_'), rows[0])
     out = []
 
