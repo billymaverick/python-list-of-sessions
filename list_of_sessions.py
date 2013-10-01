@@ -21,6 +21,11 @@ class ListOfSessions(object):
     def generate_report(self):
         """Generate the end of day report from object data"""
 
+
+    def __iter__(self):
+        """Allow iteration over list of sessions, returns row dicts"""
+        return iter(self.rows)
+
     # TODO: Split QA and review fields to determine session duration
     # TODO: Determine segment
     def __preprocess(self, rows):
@@ -81,6 +86,24 @@ class ListOfSessions(object):
                     row_dict['segment'] = 'b2b'
             else:
                 row_dict['segment'] = 'b2c'
+
+        # Determine stage for each row
+        # TODO: This will have to change when I break up QA and Review fields
+        for row_dict in row_dicts:
+            if not row_dict['is_finished?']:
+                row_dict['stage'] = 'transcribing'
+            else:
+                if not row_dict['qa']:
+                    row_dict['stage'] = 'ready_for_qa'
+                elif 'Expires' in row_dict['qa']:
+                    row_dict['stage'] = 'qa_in_progress'
+                else:
+                    if not row_dict['review']:
+                        row_dict['stage'] = 'ready_for_review'
+                    elif 'Expires' in row_dict['review']:
+                        row_dict['stage'] = 'review_in_progress'
+                    else:
+                        row_dict['stage'] = 'completed'
 
         return row_dicts
 
