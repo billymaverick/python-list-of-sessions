@@ -20,7 +20,7 @@ class ListOfSessions(object):
 
     def generate_report(self):
         """Generate the end of day report from object data"""
-
+        pass
 
     def __iter__(self):
         """Allow iteration over list of sessions, returns row dicts"""
