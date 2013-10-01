@@ -10,6 +10,16 @@ from datetime import datetime, timedelta
 
 EXAMPLE = 'C:/Users/Isaac/Projects/python-list-of-sessions/los_export.csv'
 
+# Template for generating end of day report
+TEMPLATE = """
+Segment: {}
+Transcribing       - {}
+Ready for QA       - {}
+QA in progress     - {}
+Ready for review   - {}
+Review in progress - {}
+"""
+
 class ListOfSessions(object):
 
     def __init__(self, csv_file):
@@ -29,6 +39,22 @@ class ListOfSessions(object):
     def __iter__(self):
         """Allow iteration over list of sessions, returns row dicts"""
         return iter(self.rows)
+
+    def generate_report(self):
+        """Generate end of day report. I know it's hideous but I was
+        bloody tired, okay >:(
+        """
+        segments = sorted(self.__split_by_unique_value('segment', self.rows),
+                          key=lambda k: k['segment'])
+        for item in segments:
+            item = sorted(self.__split_by_unique_value('stage', item))
+            print TEMPLATE.format(item[0]['segment'],
+                                  self.__sum_durations(item[5]),
+                                  self.__sum_durations(item[1]),
+                                  self.__sum_durations(item[0]),
+                                  self.__sum_durations(item[2]),
+                                  self.__sum_durations(item[3]))
+
 
     # TODO: Split QA and review fields to determine session duration
     def __preprocess(self, rows):
@@ -125,6 +151,6 @@ class ListOfSessions(object):
             if value not in out.keys():
                 out[value] = [row]
             else:
-                out[value] += [row]
+                out[value].append(row)
 
-        return out
+        return [x for x in out.itervalues()]
