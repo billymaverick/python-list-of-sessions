@@ -20,7 +20,11 @@ class ListOfSessions(object):
 
     def generate_report(self):
         """Generate the end of day report from object data"""
-        pass
+        segments = self.__split_by_unique_value('segment', self.rows)
+        for row_dicts in segments.itervalues():
+            row_dicts = self.__split_by_unique_value('stage', row_dicts)
+
+        return segments
 
     def __iter__(self):
         """Allow iteration over list of sessions, returns row dicts"""
@@ -112,3 +116,15 @@ class ListOfSessions(object):
         total = reduce(lambda x, y: x + y, durations)
 
         return total
+
+    def __split_by_unique_value(self, field, row_dicts):
+        """Split a list of row dicts by unique value in field"""
+        out = {}
+        for row in row_dicts:
+            value = row[field]
+            if value not in out.keys():
+                out[value] = [row]
+            else:
+                out[value] += [row]
+
+        return out
