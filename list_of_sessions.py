@@ -27,7 +27,6 @@ class ListOfSessions(object):
         return iter(self.rows)
 
     # TODO: Split QA and review fields to determine session duration
-    # TODO: Determine segment
     def __preprocess(self, rows):
         """Fix the dodgy csv output by list of sessions and convert
         data types. Converts integers, durations, and boolean values
